@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as VerifyTokenRouteImport } from './routes/verify.$token'
+import { Route as ClaimRimIdRouteImport } from './routes/claim.$rimId'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -22,31 +24,49 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VerifyTokenRoute = VerifyTokenRouteImport.update({
+  id: '/verify/$token',
+  path: '/verify/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClaimRimIdRoute = ClaimRimIdRouteImport.update({
+  id: '/claim/$rimId',
+  path: '/claim/$rimId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/claim/$rimId': typeof ClaimRimIdRoute
+  '/verify/$token': typeof VerifyTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/claim/$rimId': typeof ClaimRimIdRoute
+  '/verify/$token': typeof VerifyTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/claim/$rimId': typeof ClaimRimIdRoute
+  '/verify/$token': typeof VerifyTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login'
+  fullPaths: '/' | '/login' | '/claim/$rimId' | '/verify/$token'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login'
-  id: '__root__' | '/' | '/login'
+  to: '/' | '/login' | '/claim/$rimId' | '/verify/$token'
+  id: '__root__' | '/' | '/login' | '/claim/$rimId' | '/verify/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
+  ClaimRimIdRoute: typeof ClaimRimIdRoute
+  VerifyTokenRoute: typeof VerifyTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +85,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/verify/$token': {
+      id: '/verify/$token'
+      path: '/verify/$token'
+      fullPath: '/verify/$token'
+      preLoaderRoute: typeof VerifyTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/claim/$rimId': {
+      id: '/claim/$rimId'
+      path: '/claim/$rimId'
+      fullPath: '/claim/$rimId'
+      preLoaderRoute: typeof ClaimRimIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
+  ClaimRimIdRoute: ClaimRimIdRoute,
+  VerifyTokenRoute: VerifyTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
