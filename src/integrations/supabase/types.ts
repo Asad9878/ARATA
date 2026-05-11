@@ -14,16 +14,210 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      claims: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string | null
+          id: string
+          issue_description: string
+          photo_urls: string[] | null
+          resolved_at: string | null
+          rim_id: string
+          status: Database["public"]["Enums"]["claim_status"]
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          customer_phone?: string | null
+          id?: string
+          issue_description: string
+          photo_urls?: string[] | null
+          resolved_at?: string | null
+          rim_id: string
+          status?: Database["public"]["Enums"]["claim_status"]
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string | null
+          id?: string
+          issue_description?: string
+          photo_urls?: string[] | null
+          resolved_at?: string | null
+          rim_id?: string
+          status?: Database["public"]["Enums"]["claim_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claims_rim_id_fkey"
+            columns: ["rim_id"]
+            isOneToOne: false
+            referencedRelation: "rims"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          sku: string
+          warranty_months: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          sku: string
+          warranty_months?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          sku?: string
+          warranty_months?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          dealer_name: string | null
+          full_name: string | null
+          id: string
+          phone: string | null
+        }
+        Insert: {
+          created_at?: string
+          dealer_name?: string | null
+          full_name?: string | null
+          id: string
+          phone?: string | null
+        }
+        Update: {
+          created_at?: string
+          dealer_name?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+        }
+        Relationships: []
+      }
+      rims: {
+        Row: {
+          activation_date: string | null
+          created_at: string
+          dealer_id: string | null
+          expiry_date: string | null
+          id: string
+          motorcycle_make: string | null
+          motorcycle_model: string | null
+          notes: string | null
+          owner_address: string | null
+          owner_email: string | null
+          owner_name: string | null
+          owner_phone: string | null
+          product_id: string
+          qr_token: string
+          serial_number: string
+          status: Database["public"]["Enums"]["rim_status"]
+        }
+        Insert: {
+          activation_date?: string | null
+          created_at?: string
+          dealer_id?: string | null
+          expiry_date?: string | null
+          id?: string
+          motorcycle_make?: string | null
+          motorcycle_model?: string | null
+          notes?: string | null
+          owner_address?: string | null
+          owner_email?: string | null
+          owner_name?: string | null
+          owner_phone?: string | null
+          product_id: string
+          qr_token?: string
+          serial_number: string
+          status?: Database["public"]["Enums"]["rim_status"]
+        }
+        Update: {
+          activation_date?: string | null
+          created_at?: string
+          dealer_id?: string | null
+          expiry_date?: string | null
+          id?: string
+          motorcycle_make?: string | null
+          motorcycle_model?: string | null
+          notes?: string | null
+          owner_address?: string | null
+          owner_email?: string | null
+          owner_name?: string | null
+          owner_phone?: string | null
+          product_id?: string
+          qr_token?: string
+          serial_number?: string
+          status?: Database["public"]["Enums"]["rim_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rims_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "dealer"
+      claim_status: "pending" | "approved" | "rejected"
+      rim_status: "registered" | "activated" | "claimed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +344,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "dealer"],
+      claim_status: ["pending", "approved", "rejected"],
+      rim_status: ["registered", "activated", "claimed"],
+    },
   },
 } as const
