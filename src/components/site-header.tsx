@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 
 export function SiteHeader() {
-  const { user, isAdmin, isDealer, signOut } = useAuth();
+  const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
 
   return (
@@ -22,11 +22,6 @@ export function SiteHeader() {
         <nav className="flex items-center gap-2">
           {user ? (
             <>
-              {isDealer && (
-                <Button variant="ghost" size="sm" asChild>
-                  <Link to="/dealer">Dealer</Link>
-                </Button>
-              )}
               {isAdmin && (
                 <Button variant="ghost" size="sm" asChild>
                   <Link to="/admin">
@@ -47,7 +42,7 @@ export function SiteHeader() {
             </>
           ) : (
             <Button size="sm" asChild>
-              <Link to="/login">Sign in</Link>
+              <Link to="/login">Admin sign in</Link>
             </Button>
           )}
         </nav>

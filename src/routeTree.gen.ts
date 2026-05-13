@@ -14,7 +14,6 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VerifyTokenRouteImport } from './routes/verify.$token'
 import { Route as ClaimRimIdRouteImport } from './routes/claim.$rimId'
-import { Route as AuthenticatedDealerRouteImport } from './routes/_authenticated/dealer'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 
 const LoginRoute = LoginRouteImport.update({
@@ -41,11 +40,6 @@ const ClaimRimIdRoute = ClaimRimIdRouteImport.update({
   path: '/claim/$rimId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedDealerRoute = AuthenticatedDealerRouteImport.update({
-  id: '/dealer',
-  path: '/dealer',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -56,7 +50,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/admin': typeof AuthenticatedAdminRoute
-  '/dealer': typeof AuthenticatedDealerRoute
   '/claim/$rimId': typeof ClaimRimIdRoute
   '/verify/$token': typeof VerifyTokenRoute
 }
@@ -64,7 +57,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/admin': typeof AuthenticatedAdminRoute
-  '/dealer': typeof AuthenticatedDealerRoute
   '/claim/$rimId': typeof ClaimRimIdRoute
   '/verify/$token': typeof VerifyTokenRoute
 }
@@ -74,28 +66,20 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
-  '/_authenticated/dealer': typeof AuthenticatedDealerRoute
   '/claim/$rimId': typeof ClaimRimIdRoute
   '/verify/$token': typeof VerifyTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/login'
-    | '/admin'
-    | '/dealer'
-    | '/claim/$rimId'
-    | '/verify/$token'
+  fullPaths: '/' | '/login' | '/admin' | '/claim/$rimId' | '/verify/$token'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/admin' | '/dealer' | '/claim/$rimId' | '/verify/$token'
+  to: '/' | '/login' | '/admin' | '/claim/$rimId' | '/verify/$token'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/login'
     | '/_authenticated/admin'
-    | '/_authenticated/dealer'
     | '/claim/$rimId'
     | '/verify/$token'
   fileRoutesById: FileRoutesById
@@ -145,13 +129,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClaimRimIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/dealer': {
-      id: '/_authenticated/dealer'
-      path: '/dealer'
-      fullPath: '/dealer'
-      preLoaderRoute: typeof AuthenticatedDealerRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -164,12 +141,10 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
-  AuthenticatedDealerRoute: typeof AuthenticatedDealerRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
-  AuthenticatedDealerRoute: AuthenticatedDealerRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -186,3 +161,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

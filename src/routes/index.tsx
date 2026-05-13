@@ -80,12 +80,12 @@ function Index() {
         <div className="grid gap-6 md:grid-cols-2">
           <Card className="border-border/60 bg-gradient-steel p-8 shadow-elevated">
             <CircleGauge className="mb-4 h-8 w-8 text-primary" />
-            <h2 className="text-2xl font-semibold">For Dealers</h2>
+            <h2 className="text-2xl font-semibold">Admin operations</h2>
             <p className="mt-2 text-muted-foreground">
-              Register every rim you receive, generate QR labels, and track activations across your customers.
+              Dispatch rim batches to dealers, generate serial ranges, and resolve warranty claims from one console.
             </p>
             <Button className="mt-6" asChild>
-              <Link to="/login">Dealer sign in</Link>
+              <Link to="/login">Admin sign in</Link>
             </Button>
           </Card>
           <Card className="border-border/60 bg-card/60 p-8 shadow-elevated">
