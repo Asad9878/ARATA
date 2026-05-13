@@ -16,19 +16,16 @@ export const Route = createFileRoute("/login")({
 });
 
 function LoginPage() {
-  const { user, isAdmin, isDealer, loading } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
-  const [dealerName, setDealerName] = useState("");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!loading && user) {
-      navigate({ to: isAdmin ? "/admin" : "/dealer" });
-    }
-  }, [user, loading, isAdmin, isDealer, navigate]);
+    if (!loading && user) navigate({ to: "/admin" });
+  }, [user, loading, navigate]);
 
   async function signIn(e: React.FormEvent) {
     e.preventDefault();
@@ -46,13 +43,13 @@ function LoginPage() {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/dealer`,
-        data: { full_name: fullName, dealer_name: dealerName },
+        emailRedirectTo: `${window.location.origin}/admin`,
+        data: { full_name: fullName },
       },
     });
     setBusy(false);
     if (error) toast.error(error.message);
-    else toast.success("Account created — signing you in");
+    else toast.success("Account created");
   }
 
   return (
@@ -63,9 +60,9 @@ function LoginPage() {
           <Link to="/" className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground">
             ← Back
           </Link>
-          <h1 className="mt-3 text-2xl font-semibold">Dealer portal</h1>
+          <h1 className="mt-3 text-2xl font-semibold">Admin portal</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Sign in to register rims and manage warranties.
+            Sign in to manage inventory, dealers, and warranty claims.
           </p>
 
           <Tabs defaultValue="signin" className="mt-6">
@@ -99,7 +96,6 @@ function LoginPage() {
               </div>
             </div>
 
-
             <TabsContent value="signin" className="mt-6">
               <form onSubmit={signIn} className="space-y-4">
                 <Field label="Email" type="email" value={email} onChange={setEmail} />
@@ -113,15 +109,11 @@ function LoginPage() {
             <TabsContent value="signup" className="mt-6">
               <form onSubmit={signUp} className="space-y-4">
                 <Field label="Full name" value={fullName} onChange={setFullName} />
-                <Field label="Dealership / shop name" value={dealerName} onChange={setDealerName} />
                 <Field label="Email" type="email" value={email} onChange={setEmail} />
                 <Field label="Password" type="password" value={password} onChange={setPassword} />
                 <Button type="submit" className="w-full" disabled={busy}>
-                  {busy ? "Creating…" : "Create dealer account"}
+                  {busy ? "Creating…" : "Create admin account"}
                 </Button>
-                <p className="text-xs text-muted-foreground">
-                  All new accounts are created as dealers. Admin access is granted by an existing admin.
-                </p>
               </form>
             </TabsContent>
           </Tabs>
