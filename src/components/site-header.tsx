@@ -1,48 +1,36 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { CircleGauge, LogOut, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
+import { LogOut, ShieldCheck } from "lucide-react";
 
 export function SiteHeader() {
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, isSuperAdmin, isCompanyAdmin, isStaff, signOut } = useAuth();
   const navigate = useNavigate();
 
+  const dashboardPath = isSuperAdmin ? "/admin" : (isCompanyAdmin || isStaff) ? "/company" : "/admin";
+
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
-        <Link to="/" className="flex items-center gap-2 font-semibold tracking-tight">
-          <span className="grid h-8 w-8 place-items-center rounded-md bg-gradient-accent shadow-glow">
-            <CircleGauge className="h-5 w-5 text-accent-foreground" />
-          </span>
-          <span className="text-base">RimGuard</span>
-          <span className="hidden text-xs uppercase tracking-widest text-muted-foreground sm:inline">
-            Warranty
-          </span>
+    <header className="sticky top-0 z-40 w-full border-b border-border/40 glass-strong">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-6">
+        <Link to="/" className="flex items-center gap-2.5 font-semibold">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-brand shadow-glow">
+            <ShieldCheck className="h-4 w-4 text-primary-foreground" />
+          </div>
+          <span className="text-lg tracking-tight">Asad<span className="text-gradient-brand">2flow</span></span>
         </Link>
         <nav className="flex items-center gap-2">
           {user ? (
             <>
-              {isAdmin && (
-                <Button variant="ghost" size="sm" asChild>
-                  <Link to="/admin">
-                    <ShieldCheck className="mr-1 h-4 w-4" /> Admin
-                  </Link>
-                </Button>
-              )}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={async () => {
-                  await signOut();
-                  navigate({ to: "/" });
-                }}
-              >
-                <LogOut className="mr-1 h-4 w-4" /> Sign out
+              <Button variant="ghost" size="sm" onClick={() => navigate({ to: dashboardPath })}>
+                Dashboard
+              </Button>
+              <Button variant="ghost" size="sm" onClick={async () => { await signOut(); navigate({ to: "/" }); }}>
+                <LogOut className="h-4 w-4" />
               </Button>
             </>
           ) : (
-            <Button size="sm" asChild>
-              <Link to="/login">Admin sign in</Link>
+            <Button size="sm" className="bg-gradient-brand text-primary-foreground hover:opacity-90" onClick={() => navigate({ to: "/login" })}>
+              Admin Login
             </Button>
           )}
         </nav>

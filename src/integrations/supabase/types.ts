@@ -14,52 +14,214 @@ export type Database = {
   }
   public: {
     Tables: {
+      activations: {
+        Row: {
+          company_id: string
+          created_at: string
+          customer_city: string | null
+          customer_name: string
+          customer_phone: string
+          expiry_date: string
+          id: string
+          inventory_id: string
+          purchase_date: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          customer_city?: string | null
+          customer_name: string
+          customer_phone: string
+          expiry_date: string
+          id?: string
+          inventory_id: string
+          purchase_date: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          customer_city?: string | null
+          customer_name?: string
+          customer_phone?: string
+          expiry_date?: string
+          id?: string
+          inventory_id?: string
+          purchase_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activations_inventory_id_fkey"
+            columns: ["inventory_id"]
+            isOneToOne: true
+            referencedRelation: "inventory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       claims: {
         Row: {
-          admin_notes: string | null
+          activation_id: string | null
+          company_id: string
           created_at: string
-          customer_email: string
           customer_name: string
-          customer_phone: string | null
+          customer_phone: string
           id: string
+          image_urls: string[] | null
+          internal_remarks: string | null
+          inventory_id: string
           issue_description: string
-          photo_urls: string[] | null
           resolved_at: string | null
-          rim_id: string
           status: Database["public"]["Enums"]["claim_status"]
         }
         Insert: {
-          admin_notes?: string | null
+          activation_id?: string | null
+          company_id: string
           created_at?: string
-          customer_email: string
           customer_name: string
-          customer_phone?: string | null
+          customer_phone: string
           id?: string
+          image_urls?: string[] | null
+          internal_remarks?: string | null
+          inventory_id: string
           issue_description: string
-          photo_urls?: string[] | null
           resolved_at?: string | null
-          rim_id: string
           status?: Database["public"]["Enums"]["claim_status"]
         }
         Update: {
-          admin_notes?: string | null
+          activation_id?: string | null
+          company_id?: string
           created_at?: string
-          customer_email?: string
           customer_name?: string
-          customer_phone?: string | null
+          customer_phone?: string
           id?: string
+          image_urls?: string[] | null
+          internal_remarks?: string | null
+          inventory_id?: string
           issue_description?: string
-          photo_urls?: string[] | null
           resolved_at?: string | null
-          rim_id?: string
           status?: Database["public"]["Enums"]["claim_status"]
         }
         Relationships: [
           {
-            foreignKeyName: "claims_rim_id_fkey"
-            columns: ["rim_id"]
+            foreignKeyName: "claims_activation_id_fkey"
+            columns: ["activation_id"]
             isOneToOne: false
-            referencedRelation: "rims"
+            referencedRelation: "activations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claims_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claims_inventory_id_fkey"
+            columns: ["inventory_id"]
+            isOneToOne: false
+            referencedRelation: "inventory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      companies: {
+        Row: {
+          address: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          id: string
+          logo_url: string | null
+          name: string
+          package_id: string | null
+          slug: string
+          status: Database["public"]["Enums"]["company_status"]
+          subscription_expires_at: string | null
+          subscription_starts_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name: string
+          package_id?: string | null
+          slug: string
+          status?: Database["public"]["Enums"]["company_status"]
+          subscription_expires_at?: string | null
+          subscription_starts_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name?: string
+          package_id?: string | null
+          slug?: string
+          status?: Database["public"]["Enums"]["company_status"]
+          subscription_expires_at?: string | null
+          subscription_starts_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "companies_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "packages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_users: {
+        Row: {
+          company_id: string
+          created_at: string
+          full_name: string | null
+          id: string
+          is_active: boolean
+          phone: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          is_active?: boolean
+          phone?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          is_active?: boolean
+          phone?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_users_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
             referencedColumns: ["id"]
           },
         ]
@@ -67,148 +229,252 @@ export type Database = {
       dealers: {
         Row: {
           address: string | null
-          contact_person: string | null
+          city: string | null
+          company_id: string
           created_at: string
-          email: string | null
+          dealer_name: string
           id: string
-          name: string
+          is_active: boolean
           phone: string | null
+          shop_name: string | null
         }
         Insert: {
           address?: string | null
-          contact_person?: string | null
+          city?: string | null
+          company_id: string
           created_at?: string
-          email?: string | null
+          dealer_name: string
           id?: string
-          name: string
+          is_active?: boolean
           phone?: string | null
+          shop_name?: string | null
         }
         Update: {
           address?: string | null
-          contact_person?: string | null
+          city?: string | null
+          company_id?: string
           created_at?: string
-          email?: string | null
+          dealer_name?: string
           id?: string
-          name?: string
+          is_active?: boolean
           phone?: string | null
-        }
-        Relationships: []
-      }
-      products: {
-        Row: {
-          created_at: string
-          description: string | null
-          id: string
-          name: string
-          sku: string
-          warranty_months: number
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          name: string
-          sku: string
-          warranty_months?: number
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          name?: string
-          sku?: string
-          warranty_months?: number
-        }
-        Relationships: []
-      }
-      profiles: {
-        Row: {
-          created_at: string
-          dealer_name: string | null
-          full_name: string | null
-          id: string
-          phone: string | null
-        }
-        Insert: {
-          created_at?: string
-          dealer_name?: string | null
-          full_name?: string | null
-          id: string
-          phone?: string | null
-        }
-        Update: {
-          created_at?: string
-          dealer_name?: string | null
-          full_name?: string | null
-          id?: string
-          phone?: string | null
-        }
-        Relationships: []
-      }
-      rims: {
-        Row: {
-          activation_date: string | null
-          created_at: string
-          dealer_id: string | null
-          expiry_date: string | null
-          id: string
-          motorcycle_make: string | null
-          motorcycle_model: string | null
-          notes: string | null
-          owner_address: string | null
-          owner_email: string | null
-          owner_name: string | null
-          owner_phone: string | null
-          product_id: string
-          qr_token: string
-          serial_number: string
-          status: Database["public"]["Enums"]["rim_status"]
-        }
-        Insert: {
-          activation_date?: string | null
-          created_at?: string
-          dealer_id?: string | null
-          expiry_date?: string | null
-          id?: string
-          motorcycle_make?: string | null
-          motorcycle_model?: string | null
-          notes?: string | null
-          owner_address?: string | null
-          owner_email?: string | null
-          owner_name?: string | null
-          owner_phone?: string | null
-          product_id: string
-          qr_token?: string
-          serial_number: string
-          status?: Database["public"]["Enums"]["rim_status"]
-        }
-        Update: {
-          activation_date?: string | null
-          created_at?: string
-          dealer_id?: string | null
-          expiry_date?: string | null
-          id?: string
-          motorcycle_make?: string | null
-          motorcycle_model?: string | null
-          notes?: string | null
-          owner_address?: string | null
-          owner_email?: string | null
-          owner_name?: string | null
-          owner_phone?: string | null
-          product_id?: string
-          qr_token?: string
-          serial_number?: string
-          status?: Database["public"]["Enums"]["rim_status"]
+          shop_name?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "rims_product_id_fkey"
+            foreignKeyName: "dealers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fake_scan_attempts: {
+        Row: {
+          attempted_serial: string | null
+          attempted_token: string | null
+          company_id: string | null
+          created_at: string
+          id: string
+          ip_address: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          attempted_serial?: string | null
+          attempted_token?: string | null
+          company_id?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          attempted_serial?: string | null
+          attempted_token?: string | null
+          company_id?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fake_scan_attempts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory: {
+        Row: {
+          batch_id: string | null
+          company_id: string
+          created_at: string
+          dealer_id: string | null
+          id: string
+          product_id: string
+          qr_token: string
+          serial_number: string
+          status: Database["public"]["Enums"]["inventory_status"]
+        }
+        Insert: {
+          batch_id?: string | null
+          company_id: string
+          created_at?: string
+          dealer_id?: string | null
+          id?: string
+          product_id: string
+          qr_token?: string
+          serial_number: string
+          status?: Database["public"]["Enums"]["inventory_status"]
+        }
+        Update: {
+          batch_id?: string | null
+          company_id?: string
+          created_at?: string
+          dealer_id?: string | null
+          id?: string
+          product_id?: string
+          qr_token?: string
+          serial_number?: string
+          status?: Database["public"]["Enums"]["inventory_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]
+      }
+      packages: {
+        Row: {
+          created_at: string
+          duration_months: number
+          features: Json | null
+          id: string
+          is_active: boolean
+          max_dealers: number
+          max_products: number
+          max_qr_codes: number
+          name: string
+          price: number
+        }
+        Insert: {
+          created_at?: string
+          duration_months?: number
+          features?: Json | null
+          id?: string
+          is_active?: boolean
+          max_dealers?: number
+          max_products?: number
+          max_qr_codes?: number
+          name: string
+          price?: number
+        }
+        Update: {
+          created_at?: string
+          duration_months?: number
+          features?: Json | null
+          id?: string
+          is_active?: boolean
+          max_dealers?: number
+          max_products?: number
+          max_qr_codes?: number
+          name?: string
+          price?: number
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          category: string | null
+          company_id: string
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          name: string
+          sku: string | null
+          warranty_months: number
+        }
+        Insert: {
+          category?: string | null
+          company_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name: string
+          sku?: string | null
+          warranty_months?: number
+        }
+        Update: {
+          category?: string | null
+          company_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name?: string
+          sku?: string | null
+          warranty_months?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          phone: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          phone?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
@@ -236,6 +502,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      belongs_to_company: {
+        Args: { _company_id: string; _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -243,11 +513,18 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      user_company_id: { Args: { _user_id: string }; Returns: string }
+      user_company_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
     }
     Enums: {
-      app_role: "admin" | "dealer"
-      claim_status: "pending" | "approved" | "rejected"
-      rim_status: "registered" | "activated" | "claimed"
+      app_role: "super_admin" | "company_admin" | "staff"
+      claim_status: "pending" | "under_review" | "approved" | "rejected"
+      company_status: "active" | "suspended" | "expired"
+      inventory_status: "unused" | "activated" | "claimed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -375,9 +652,10 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "dealer"],
-      claim_status: ["pending", "approved", "rejected"],
-      rim_status: ["registered", "activated", "claimed"],
+      app_role: ["super_admin", "company_admin", "staff"],
+      claim_status: ["pending", "under_review", "approved", "rejected"],
+      company_status: ["active", "suspended", "expired"],
+      inventory_status: ["unused", "activated", "claimed"],
     },
   },
 } as const
