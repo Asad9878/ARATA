@@ -12,8 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as VerifyTokenRouteImport } from './routes/verify.$token'
-import { Route as ClaimRimIdRouteImport } from './routes/claim.$rimId'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 
 const LoginRoute = LoginRouteImport.update({
@@ -30,16 +28,6 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const VerifyTokenRoute = VerifyTokenRouteImport.update({
-  id: '/verify/$token',
-  path: '/verify/$token',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ClaimRimIdRoute = ClaimRimIdRouteImport.update({
-  id: '/claim/$rimId',
-  path: '/claim/$rimId',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -50,15 +38,11 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/admin': typeof AuthenticatedAdminRoute
-  '/claim/$rimId': typeof ClaimRimIdRoute
-  '/verify/$token': typeof VerifyTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/admin': typeof AuthenticatedAdminRoute
-  '/claim/$rimId': typeof ClaimRimIdRoute
-  '/verify/$token': typeof VerifyTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -66,30 +50,19 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
-  '/claim/$rimId': typeof ClaimRimIdRoute
-  '/verify/$token': typeof VerifyTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/admin' | '/claim/$rimId' | '/verify/$token'
+  fullPaths: '/' | '/login' | '/admin'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/admin' | '/claim/$rimId' | '/verify/$token'
-  id:
-    | '__root__'
-    | '/'
-    | '/_authenticated'
-    | '/login'
-    | '/_authenticated/admin'
-    | '/claim/$rimId'
-    | '/verify/$token'
+  to: '/' | '/login' | '/admin'
+  id: '__root__' | '/' | '/_authenticated' | '/login' | '/_authenticated/admin'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
-  ClaimRimIdRoute: typeof ClaimRimIdRoute
-  VerifyTokenRoute: typeof VerifyTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -113,20 +86,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/verify/$token': {
-      id: '/verify/$token'
-      path: '/verify/$token'
-      fullPath: '/verify/$token'
-      preLoaderRoute: typeof VerifyTokenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/claim/$rimId': {
-      id: '/claim/$rimId'
-      path: '/claim/$rimId'
-      fullPath: '/claim/$rimId'
-      preLoaderRoute: typeof ClaimRimIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -155,9 +114,17 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
-  ClaimRimIdRoute: ClaimRimIdRoute,
-  VerifyTokenRoute: VerifyTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
