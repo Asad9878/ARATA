@@ -11,10 +11,14 @@ export const Route = createFileRoute("/snake")({
   component: SnakePage,
 });
 
-const COLS = 18;
-const ROWS = 12;
-const CELL = 20;
+const COLS = 16;
+const ROWS = 9;
+const CELL = 15;
 const TICK_MS = 130;
+
+// Screen padding (lcd px-2 + bezel p-3 + phone body p-5), doubled for both sides.
+const SCREEN_PADDING = (8 + 12 + 20) * 2;
+const PHONE_WIDTH = COLS * CELL + SCREEN_PADDING;
 
 type Point = { x: number; y: number };
 type Dir = "UP" | "DOWN" | "LEFT" | "RIGHT";
@@ -35,7 +39,9 @@ function SnakePage() {
     { x: 6, y: 6 },
   ]);
   const [dir, setDir] = useState<Dir>("RIGHT");
-  const [food, setFood] = useState<Point>(() => randomFood(snake));
+  // Deterministic placeholder so server and client render the same markup on
+  // first paint; replaced with a real random position once mounted.
+  const [food, setFood] = useState<Point>({ x: COLS - 2, y: ROWS - 2 });
   const [score, setScore] = useState(0);
   const [best, setBest] = useState(0);
   const [status, setStatus] = useState<"ready" | "playing" | "over">("ready");
@@ -49,6 +55,8 @@ function SnakePage() {
   useEffect(() => {
     const saved = Number(localStorage.getItem("nokia-snake-best") || 0);
     if (!Number.isNaN(saved)) setBest(saved);
+    setFood(randomFood(snake));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const reset = useCallback(() => {
@@ -104,7 +112,12 @@ function SnakePage() {
       setSnake((prev) => {
         const d = nextDirRef.current;
         const head = prev[0];
-        const delta = { UP: { x: 0, y: -1 }, DOWN: { x: 0, y: 1 }, LEFT: { x: -1, y: 0 }, RIGHT: { x: 1, y: 0 } }[d];
+        const delta = {
+          UP: { x: 0, y: -1 },
+          DOWN: { x: 0, y: 1 },
+          LEFT: { x: -1, y: 0 },
+          RIGHT: { x: 1, y: 0 },
+        }[d];
         const newHead = { x: head.x + delta.x, y: head.y + delta.y };
 
         const hitsWall = newHead.x < 0 || newHead.x >= COLS || newHead.y < 0 || newHead.y >= ROWS;
@@ -137,10 +150,15 @@ function SnakePage() {
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-neutral-900 p-4">
       <div className="flex flex-col items-center gap-4">
-        <h1 className="text-neutral-400 text-sm tracking-[0.3em] uppercase font-mono">Nokia 3310 · Snake</h1>
+        <h1 className="text-neutral-400 text-sm tracking-[0.3em] uppercase font-mono">
+          Nokia 3310 · Snake
+        </h1>
 
         {/* Phone body */}
-        <div className="w-[320px] rounded-[36px] bg-gradient-to-b from-[#2b2f28] to-[#1c1f19] p-5 shadow-2xl border-4 border-[#111310]">
+        <div
+          className="rounded-[36px] bg-gradient-to-b from-[#2b2f28] to-[#1c1f19] p-5 shadow-2xl border-4 border-[#111310]"
+          style={{ width: PHONE_WIDTH }}
+        >
           {/* Screen bezel */}
           <div className="rounded-md bg-[#9aa66b] p-3 shadow-inner">
             <div className="rounded-sm bg-[#c3d17a] px-2 py-2 shadow-[inset_0_2px_6px_rgba(0,0,0,0.35)]">
@@ -199,7 +217,9 @@ function SnakePage() {
           </div>
 
           {/* Nokia branding */}
-          <div className="text-center text-[#8b9a7a] font-mono text-[10px] tracking-[0.4em] mt-3 mb-1">NOKIA</div>
+          <div className="text-center text-[#8b9a7a] font-mono text-[10px] tracking-[0.4em] mt-3 mb-1">
+            NOKIA
+          </div>
 
           {/* Keypad */}
           <div className="mt-3 flex flex-col items-center gap-3">
@@ -238,7 +258,9 @@ function SnakePage() {
           </div>
         </div>
 
-        <p className="text-neutral-500 text-xs font-mono">Arrow keys / WASD to move · Space to start</p>
+        <p className="text-neutral-500 text-xs font-mono">
+          Arrow keys / WASD to move · Space to start
+        </p>
       </div>
     </div>
   );
