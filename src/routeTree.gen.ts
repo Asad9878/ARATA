@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VerifyRouteImport } from './routes/verify'
+import { Route as SnakeRouteImport } from './routes/snake'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
@@ -20,6 +21,11 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 const VerifyRoute = VerifyRouteImport.update({
   id: '/verify',
   path: '/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SnakeRoute = SnakeRouteImport.update({
+  id: '/snake',
+  path: '/snake',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -55,6 +61,7 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/snake': typeof SnakeRoute
   '/verify': typeof VerifyRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/company': typeof AuthenticatedCompanyRoute
@@ -63,6 +70,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/snake': typeof SnakeRoute
   '/verify': typeof VerifyRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/company': typeof AuthenticatedCompanyRoute
@@ -73,6 +81,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
+  '/snake': typeof SnakeRoute
   '/verify': typeof VerifyRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/company': typeof AuthenticatedCompanyRoute
@@ -83,17 +92,26 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/snake'
     | '/verify'
     | '/admin'
     | '/company'
     | '/activate/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/verify' | '/admin' | '/company' | '/activate/$id'
+  to:
+    | '/'
+    | '/login'
+    | '/snake'
+    | '/verify'
+    | '/admin'
+    | '/company'
+    | '/activate/$id'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/login'
+    | '/snake'
     | '/verify'
     | '/_authenticated/admin'
     | '/_authenticated/company'
@@ -104,6 +122,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
+  SnakeRoute: typeof SnakeRoute
   VerifyRoute: typeof VerifyRoute
   ActivateIdRoute: typeof ActivateIdRoute
 }
@@ -115,6 +134,13 @@ declare module '@tanstack/react-router' {
       path: '/verify'
       fullPath: '/verify'
       preLoaderRoute: typeof VerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/snake': {
+      id: '/snake'
+      path: '/snake'
+      fullPath: '/snake'
+      preLoaderRoute: typeof SnakeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -180,9 +206,20 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
+  SnakeRoute: SnakeRoute,
   VerifyRoute: VerifyRoute,
   ActivateIdRoute: ActivateIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
