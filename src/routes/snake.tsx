@@ -25,7 +25,8 @@ type Dir = "UP" | "DOWN" | "LEFT" | "RIGHT";
 
 const OPPOSITE: Record<Dir, Dir> = { UP: "DOWN", DOWN: "UP", LEFT: "RIGHT", RIGHT: "LEFT" };
 
-function randomFood(snake: Point[]): Point {
+function randomFood(snake: Point[]): Point | null {
+  if (snake.length >= COLS * ROWS) return null;
   while (true) {
     const p = { x: Math.floor(Math.random() * COLS), y: Math.floor(Math.random() * ROWS) };
     if (!snake.some((s) => s.x === p.x && s.y === p.y)) return p;
@@ -41,10 +42,10 @@ function SnakePage() {
   const [dir, setDir] = useState<Dir>("RIGHT");
   // Deterministic placeholder so server and client render the same markup on
   // first paint; replaced with a real random position once mounted.
-  const [food, setFood] = useState<Point>({ x: COLS - 2, y: ROWS - 2 });
+  const [food, setFood] = useState<Point | null>({ x: COLS - 2, y: ROWS - 2 });
   const [score, setScore] = useState(0);
   const [best, setBest] = useState(0);
-  const [status, setStatus] = useState<"ready" | "playing" | "over">("ready");
+  const [status, setStatus] = useState<"ready" | "playing" | "over" | "won">("ready");
 
   const dirRef = useRef(dir);
   const nextDirRef = useRef(dir);
@@ -121,7 +122,10 @@ function SnakePage() {
         const newHead = { x: head.x + delta.x, y: head.y + delta.y };
 
         const hitsWall = newHead.x < 0 || newHead.x >= COLS || newHead.y < 0 || newHead.y >= ROWS;
-        const hitsSelf = prev.some((s) => s.x === newHead.x && s.y === newHead.y);
+        // The tail cell is vacated this tick (food never spawns on the snake,
+        // so a growing move can't land there either), so it's not a collision.
+        const body = prev.slice(0, -1);
+        const hitsSelf = body.some((s) => s.x === newHead.x && s.y === newHead.y);
 
         if (hitsWall || hitsSelf) {
           setStatus("over");
@@ -133,11 +137,13 @@ function SnakePage() {
           return prev;
         }
 
-        const ateFood = newHead.x === food.x && newHead.y === food.y;
+        const ateFood = food !== null && newHead.x === food.x && newHead.y === food.y;
         const nextSnake = [newHead, ...prev];
         if (ateFood) {
           setScore((s) => s + 10);
-          setFood(randomFood(nextSnake));
+          const next = randomFood(nextSnake);
+          setFood(next);
+          if (next === null) setStatus("won");
         } else {
           nextSnake.pop();
         }
@@ -191,13 +197,15 @@ function SnakePage() {
                       fill="#2b3a1a"
                     />
                   ))}
-                  <rect
-                    x={food.x * CELL + 4}
-                    y={food.y * CELL + 4}
-                    width={CELL - 8}
-                    height={CELL - 8}
-                    fill="#2b3a1a"
-                  />
+                  {food && (
+                    <rect
+                      x={food.x * CELL + 4}
+                      y={food.y * CELL + 4}
+                      width={CELL - 8}
+                      height={CELL - 8}
+                      fill="#2b3a1a"
+                    />
+                  )}
                 </svg>
 
                 {status !== "playing" && (
@@ -206,9 +214,11 @@ function SnakePage() {
                     style={{ color: "#2b3a1a", backgroundColor: "rgba(195,209,122,0.92)" }}
                   >
                     <span className="text-xs font-bold tracking-widest">
-                      {status === "ready" ? "SNAKE II" : "GAME OVER"}
+                      {status === "ready" ? "SNAKE II" : status === "won" ? "YOU WIN" : "GAME OVER"}
                     </span>
-                    {status === "over" && <span className="text-[10px]">SCORE {score}</span>}
+                    {(status === "over" || status === "won") && (
+                      <span className="text-[10px]">SCORE {score}</span>
+                    )}
                     <span className="text-[10px] animate-pulse">PRESS START</span>
                   </div>
                 )}
